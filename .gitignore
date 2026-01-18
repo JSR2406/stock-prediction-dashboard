@@ -1,0 +1,55 @@
+﻿# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
+SavedModels/
+saved_models/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn
+frontend/dist/
+frontend/node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+backend/.env
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Data and Models
+data/raw/*
+!data/raw/.gitkeep
+saved_models/*.h5
+saved_models/*.keras
+saved_models/*.pkl
+temp/
+
+# Vercel
+.vercel
+
+# Project specific
+backend/venv/
+frontend/build/
+*.log

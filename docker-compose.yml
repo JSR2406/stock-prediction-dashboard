@@ -1,0 +1,122 @@
+# Stock Prediction Dashboard - Docker Compose
+# Development and production configuration
+
+services:
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: stockai-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql://stockai:stockai123@postgres:5432/stockai
+      - REDIS_URL=redis://redis:6379/0
+      - METALS_API_KEY=${METALS_API_KEY:-}
+      - ALPHA_VANTAGE_KEY=${ALPHA_VANTAGE_KEY:-}
+      - COINGECKO_API_KEY=${COINGECKO_API_KEY:-}
+    volumes:
+      - ./ml-models/saved_models:/app/saved_models
+      - backend-logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/api/v1/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - stockai-network
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: stockai-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:80/" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - stockai-network
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: stockai-postgres
+    environment:
+      - POSTGRES_USER=stockai
+      - POSTGRES_PASSWORD=stockai123
+      - POSTGRES_DB=stockai
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U stockai -d stockai" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - stockai-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: stockai-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - stockai-network
+  # Nginx Reverse Proxy (optional, for production)
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: stockai-nginx
+  #   ports:
+  #     - "443:443"
+  #     - "80:80"
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - ./nginx/ssl:/etc/nginx/ssl:ro
+  #   depends_on:
+  #     - frontend
+  #     - backend
+  #   restart: unless-stopped
+  #   networks:
+  #     - stockai-network
+
+volumes:
+  postgres-data:
+    name: stockai-postgres-data
+  redis-data:
+    name: stockai-redis-data
+  backend-logs:
+    name: stockai-backend-logs
+
+networks:
+  stockai-network:
+    name: stockai-network
+    driver: bridge

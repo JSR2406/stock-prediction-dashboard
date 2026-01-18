@@ -1,0 +1,35 @@
+# FastAPI and Server
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Data Processing
+pandas==2.2.0
+numpy==1.26.0
+
+# Stock Data APIs
+yfinance==0.2.35
+httpx==0.26.0
+
+# Caching
+redis==5.0.1
+
+# Configuration
+python-dotenv==1.0.0
+pydantic-settings==2.1.0
+pydantic==2.5.3
+
+# Utilities
+slowapi==0.1.9
+structlog==24.1.0
+
+# ML (install separately if needed)
+scikit-learn==1.4.0
+
+# Database
+sqlalchemy==2.0.25
+alembic==1.13.1
+psycopg2-binary==2.9.9
+
+# WebSocket
+websockets==12.0
