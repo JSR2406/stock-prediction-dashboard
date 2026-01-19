@@ -21,7 +21,7 @@ from app.utils.logging import logger, RequestLogger
 from app.utils.cache import cache_manager
 from app.utils.rate_limiter import limiter, rate_limit_handler
 from app.utils.exceptions import BaseAPIException
-from app.routes import stocks, crypto, commodities, predictions, analysis, websocket, history
+from app.routes import stocks, crypto, commodities, predictions, analysis, websocket, history, financial
 from app.models.schemas import HealthCheckResponse, ServiceHealth, ErrorResponse, ErrorDetail
 
 
@@ -236,6 +236,7 @@ app.include_router(commodities.router, prefix="/api/v1")
 app.include_router(predictions.router, prefix="/api/v1")
 app.include_router(analysis.router, prefix="/api/v1")
 app.include_router(history.router, prefix="/api/v1")
+app.include_router(financial.router, prefix="/api/v1")
 app.include_router(websocket.router)
 
 

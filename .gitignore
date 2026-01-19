@@ -53,3 +53,8 @@ temp/
 backend/venv/
 frontend/build/
 *.log
+
+# MCP Server
+financial-mcp/.env
+financial-mcp/venv/
+financial-mcp/.venv/

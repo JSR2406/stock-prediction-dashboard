@@ -12,6 +12,7 @@ from app.models.schemas import (
     TopMover, MarketSentiment
 )
 from app.services.data_fetcher import data_fetcher
+from app.services.smart_data_fetcher import smart_data_fetcher
 from app.utils.rate_limiter import limiter
 from app.utils.logging import logger
 from app.utils.cache import cache_manager, cached
@@ -128,29 +129,40 @@ async def get_stock_quote(
         return cached_data
     
     try:
-        data = await data_fetcher.fetch_stock_data(symbol, period="5d", exchange=exchange.value)
+        # Determine strict suffix for Indian stocks if NSE/BSE
+        search_symbol = symbol
+        if exchange == MarketType.NSE and not symbol.endswith(".NS"):
+            search_symbol = f"{symbol}.NS"
+        elif exchange == MarketType.BSE and not symbol.endswith(".BO"):
+            search_symbol = f"{symbol}.BO"
+
+        # Use SmartDataFetcher
+        data = await smart_data_fetcher.get_stock_price(search_symbol)
+        
+        # Map response to schema
         result = {
             "success": True,
             "data": {
-                "symbol": data["symbol"],
-                "name": data["name"],
-                "exchange": data["exchange"],
-                "current_price": data["current_price"],
-                "previous_close": data["previous_close"],
-                "open_price": data["open_price"],
-                "high": data["high"],
-                "low": data["low"],
-                "volume": data["volume"],
-                "change": data["change"],
-                "change_percent": data["change_percent"],
-                "trend": data["trend"],
-                "market_cap": data.get("market_cap"),
-                "pe_ratio": data.get("pe_ratio"),
-                "week_52_high": data.get("week_52_high"),
-                "week_52_low": data.get("week_52_low"),
-                "market_status": get_market_status()
+                "symbol": symbol, # Keep original requested symbol
+                "name": data.get("name", symbol),
+                "exchange": exchange.value,
+                "current_price": data.get("price", 0.0),
+                "previous_close": 0.0, # Not always available in simple price call
+                "open_price": data.get("open", 0.0),
+                "high": data.get("high", 0.0),
+                "low": data.get("low", 0.0),
+                "volume": data.get("volume", 0),
+                "change": data.get("change", 0.0),
+                "change_percent": data.get("change_percent", 0.0),
+                "trend": "up" if data.get("change", 0) >= 0 else "down",
+                "market_cap": None, 
+                "pe_ratio": None,
+                "week_52_high": None,
+                "week_52_low": None,
+                "market_status": get_market_status(),
+                "source": data.get("source", "unknown")
             },
-            "last_updated": data["last_updated"]
+            "last_updated": datetime.now().isoformat()
         }
         await cache_manager.set(cache_key, result, ttl=300)
         return result
@@ -176,15 +188,48 @@ async def get_stock_historical(
         return cached_data
     
     try:
-        data = await data_fetcher.fetch_stock_data(symbol, period=period, exchange=exchange.value)
+        # Determine suffix
+        search_symbol = symbol
+        if exchange == MarketType.NSE and not symbol.endswith(".NS"):
+            search_symbol = f"{symbol}.NS"
+        elif exchange == MarketType.BSE and not symbol.endswith(".BO"):
+            search_symbol = f"{symbol}.BO"
+            
+        # Calc dates for history
+        end_date = datetime.now().strftime('%Y-%m-%d')
+        
+        # Parse period to days
+        period_days = 365 # Default
+        interval = "1d"
+        
+        period_map = {
+            "1d": 1, "5d": 5, "1mo": 30, "3mo": 90, "6mo": 180, 
+            "1y": 365, "2y": 730, "5y": 1825, "max": 365*10
+        }
+        
+        if period in period_map:
+            period_days = period_map[period]
+            # Adjust interval for short periods
+            if period == "1d": interval = "15m"
+            elif period == "5d": interval = "1h"
+            
+        start_date = (datetime.now() - timedelta(days=period_days)).strftime('%Y-%m-%d')
+        
+        data = await smart_data_fetcher.get_historical_prices(
+            search_symbol, 
+            start_date=start_date, 
+            end_date=end_date,
+            interval=interval
+        )
+        
         result = {
             "success": True,
-            "symbol": data["symbol"],
-            "name": data["name"],
-            "exchange": data["exchange"],
+            "symbol": symbol,
+            "name": symbol, # Placeholder
+            "exchange": exchange.value,
             "period": period,
-            "historical": data.get("historical", []),
-            "last_updated": data["last_updated"]
+            "historical": data,
+            "last_updated": datetime.now().isoformat()
         }
         
         # Longer cache for historical data

@@ -119,31 +119,28 @@ class TestPredictionEndpoints:
     """Test prediction endpoints."""
     
     def test_get_prediction(self):
-        """Test getting stock prediction."""
-        response = client.post(
-            "/api/v1/predictions",
-            json={
-                "symbol": "RELIANCE",
-                "horizon": "7d"
-            }
-        )
+        """Test getting stock prediction (next-day)."""
+        response = client.get("/api/v1/predictions/RELIANCE")
         assert response.status_code == 200
         data = response.json()
         assert data["success"] is True
         assert "data" in data
-        assert "predicted_prices" in data["data"]
+        # API returns predicted_price for single prediction
+        assert "predicted_price" in data["data"]
+    
+    def test_get_weekly_prediction(self):
+        """Test getting weekly stock prediction."""
+        response = client.get("/api/v1/predictions/RELIANCE/weekly")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["success"] is True
+        assert "data" in data
     
     def test_prediction_invalid_symbol(self):
-        """Test prediction with invalid symbol format."""
-        response = client.post(
-            "/api/v1/predictions",
-            json={
-                "symbol": "",
-                "horizon": "7d"
-            }
-        )
-        # Should still work but return error or demo data
-        assert response.status_code in [200, 400]
+        """Test prediction with empty/invalid path."""
+        # Empty symbol should return 404 or 422
+        response = client.get("/api/v1/predictions/")
+        assert response.status_code in [404, 307]  # 307 is redirect for trailing slash
     
     def test_get_models_status(self):
         """Test getting ML models status."""
@@ -161,27 +158,35 @@ class TestAnalysisEndpoints:
         response = client.get("/api/v1/analysis/RELIANCE/technical")
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] is True
-        assert "indicators" in data["data"]
+        # Response model returns data directly with indicators key
+        assert "indicators" in data
+        assert "symbol" in data
     
     def test_get_signals(self):
         """Test getting trading signals."""
         response = client.get("/api/v1/analysis/TCS/signals")
         assert response.status_code == 200
         data = response.json()
-        assert "overall_signal" in data["data"]
+        # SignalResponse returns 'overall' not 'overall_signal'
+        assert "overall" in data
+        assert "signals" in data
     
     def test_get_support_resistance(self):
         """Test support/resistance levels."""
         response = client.get("/api/v1/analysis/HDFCBANK/support-resistance")
         assert response.status_code == 200
+        data = response.json()
+        assert "support_levels" in data
+        assert "resistance_levels" in data
     
     def test_get_market_status(self):
         """Test market status endpoint."""
         response = client.get("/api/v1/analysis/market-status")
         assert response.status_code == 200
         data = response.json()
-        assert "is_open" in data["data"]
+        # MarketStatusResponse returns is_trading not is_open
+        assert "is_trading" in data
+        assert "status" in data
 
 
 # ============== Error Handling Tests ==============

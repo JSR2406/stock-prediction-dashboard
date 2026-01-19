@@ -25,6 +25,7 @@
 - Cryptocurrency tracking (BTC, ETH, 50+ coins)
 - Commodities (Gold, Silver, Crude Oil)
 - WebSocket-powered real-time updates
+- **Financial Datasets API**: Institutional-grade US market data & SEC filings
 
 ### 🤖 **AI-Powered Predictions**
 - **Ensemble ML Models**: LSTM + GRU + XGBoost + Random Forest
@@ -146,6 +147,7 @@ DEBUG=true
 METALS_API_KEY=your_metals_api_key      # metals-api.com
 ALPHA_VANTAGE_KEY=your_alpha_key        # alphavantage.co
 COINGECKO_API_KEY=your_coingecko_key    # coingecko.com
+FINANCIAL_DATASETS_API_KEY=your_key     # financialdatasets.ai (Required for US/Fundamental data)
 
 # Database (for production)
 DATABASE_URL=postgresql://user:pass@localhost:5432/stockai
@@ -285,6 +287,7 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) for deta
 ## 🙏 Acknowledgments
 
 - [Yahoo Finance](https://finance.yahoo.com/) for market data
+- [Financial Datasets API](https://financialdatasets.ai/) for US fundamentals & SEC filings
 - [CoinGecko](https://www.coingecko.com/) for crypto data
 - [NSE India](https://www.nseindia.com/) for Indian market information
 - [Metals-API](https://www.metals-api.com/) for commodity prices

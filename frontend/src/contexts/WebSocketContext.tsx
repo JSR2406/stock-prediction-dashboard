@@ -33,7 +33,19 @@ interface WebSocketContextType {
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined)
 
-const DEFAULT_WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/stocks'
+// Use proxied WebSocket URL in development, direct URL in production
+const getWsUrl = () => {
+    const envUrl = import.meta.env.VITE_WS_URL
+    if (envUrl) return envUrl
+
+    // In development, Vite proxies /ws to the backend  
+    if (import.meta.env.DEV) {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+        return `${protocol}//${window.location.host}/ws/stocks`
+    }
+
+    return 'ws://localhost:8000/ws/stocks'
+}
 
 export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [status, setStatus] = useState<ConnectionStatus>('disconnected')
@@ -72,7 +84,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setError(null)
 
         try {
-            const wsUrl = `${DEFAULT_WS_URL}/${clientIdRef.current}`
+            const wsUrl = `${getWsUrl()}/${clientIdRef.current}`
             wsRef.current = new WebSocket(wsUrl)
 
             wsRef.current.onopen = () => {

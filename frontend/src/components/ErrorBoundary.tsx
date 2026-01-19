@@ -7,7 +7,6 @@ import {
     Icon,
     Heading,
     Code,
-    useColorMode,
     Alert,
     AlertIcon,
     AlertTitle,

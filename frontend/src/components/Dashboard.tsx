@@ -18,16 +18,18 @@ import {
     Tab,
     TabPanel,
 } from '@chakra-ui/react'
-import { FiTrendingUp, FiActivity, FiBriefcase, FiGrid, FiPieChart } from 'react-icons/fi'
+import { FiTrendingUp, FiActivity, FiBriefcase, FiGrid, FiPieChart, FiDollarSign } from 'react-icons/fi'
 
 import MarketOverview from './MarketOverview'
 import StockCard from './StockCard'
 import PredictionDashboard from './PredictionDashboard'
 import MarketHeatmap from './MarketHeatmap'
+import FundamentalAnalysis from './FundamentalAnalysis'
 import CommoditiesPanel from './CommoditiesPanel'
 import CryptoPanel from './CryptoPanel'
 import Watchlist from './Watchlist'
 import AdvancedChart from './AdvancedChart'
+import { ErrorBoundary } from './ErrorBoundary'
 import { stocksApi, commoditiesApi, cryptoApi } from '../services/api'
 import { useWebSocket } from '../hooks'
 
@@ -189,6 +191,12 @@ export default function Dashboard() {
                             <Text>AI Predictions</Text>
                         </HStack>
                     </Tab>
+                    <Tab fontSize="xs" fontWeight="bold">
+                        <HStack spacing={2}>
+                            <Icon as={FiDollarSign} />
+                            <Text>Analysis</Text>
+                        </HStack>
+                    </Tab>
                 </TabList>
 
                 <TabPanels>
@@ -254,12 +262,23 @@ export default function Dashboard() {
 
                     {/* Heatmap Tab */}
                     <TabPanel px={0} pt={6}>
-                        <MarketHeatmap />
+                        <ErrorBoundary>
+                            <MarketHeatmap />
+                        </ErrorBoundary>
                     </TabPanel>
 
                     {/* AI Predictions Tab */}
                     <TabPanel px={0} pt={6}>
-                        <PredictionDashboard defaultSymbol="RELIANCE" />
+                        <ErrorBoundary>
+                            <PredictionDashboard defaultSymbol="RELIANCE" />
+                        </ErrorBoundary>
+                    </TabPanel>
+
+                    {/* Fundamental Analysis Tab */}
+                    <TabPanel px={0} pt={6}>
+                        <ErrorBoundary>
+                            <FundamentalAnalysis symbol="AAPL" />
+                        </ErrorBoundary>
                     </TabPanel>
                 </TabPanels>
             </Tabs>

@@ -124,10 +124,14 @@ const SignalBadge = ({ signal }: { signal: 'buy' | 'sell' | 'hold' }) => {
     )
 }
 
-export default function PredictionDashboard() {
+interface PredictionDashboardProps {
+    defaultSymbol?: string
+}
+
+export default function PredictionDashboard({ defaultSymbol = 'RELIANCE' }: PredictionDashboardProps) {
     const { colorMode } = useColorMode()
     const toast = useToast()
-    const [symbol, setSymbol] = useState('RELIANCE')
+    const [symbol, setSymbol] = useState(defaultSymbol)
     const [loading, setLoading] = useState(true)
     const [isRefreshing, setIsRefreshing] = useState(false)
     const [data, setData] = useState<PredictionData | null>(null)
