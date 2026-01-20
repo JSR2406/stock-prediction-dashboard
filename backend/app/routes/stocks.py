@@ -2,7 +2,7 @@
 Stock Routes - Enhanced API endpoints with caching and data fetcher integration.
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 from fastapi import APIRouter, Depends, Query, Request, HTTPException
 

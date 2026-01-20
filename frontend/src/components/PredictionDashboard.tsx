@@ -171,8 +171,8 @@ export default function PredictionDashboard({ defaultSymbol = 'RELIANCE' }: Pred
             setError(null)
             const response = await predictionsApi.get(stockSymbol)
 
-            if (response.data) {
-                const apiData = response.data
+            if (response.data && response.data.success && response.data.data) {
+                const apiData = response.data.data
                 // Transform API data to our frontend format
                 const transformed: PredictionData = {
                     symbol: stockSymbol,
@@ -182,7 +182,7 @@ export default function PredictionDashboard({ defaultSymbol = 'RELIANCE' }: Pred
                     confidence: apiData.confidence,
                     changePercent: apiData.change_percent,
                     quality: apiData.quality || (apiData.confidence > 80 ? 'high' : apiData.confidence > 60 ? 'medium' : 'low'),
-                    signals: apiData.technical_signals || {
+                    signals: apiData.signals || {
                         rsi: 'hold',
                         macd: 'hold',
                         sma: 'hold',

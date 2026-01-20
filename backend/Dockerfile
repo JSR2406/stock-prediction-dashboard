@@ -43,8 +43,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 # Copy application code
 COPY app/ ./app/
-COPY alembic/ ./alembic/ 2>/dev/null || true
-COPY alembic.ini . 2>/dev/null || true
+
 
 # Create directories for models and logs
 RUN mkdir -p /app/saved_models /app/logs && \

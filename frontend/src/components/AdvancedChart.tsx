@@ -84,7 +84,7 @@ export default function AdvancedChart({ symbol, onFullscreen }: AdvancedChartPro
     const fetchData = useCallback(async () => {
         try {
             setIsLoading(true)
-            const response = await stocksApi.getHistorical(symbol, timeframe)
+            const response = await stocksApi.getHistorical(symbol, timeframe.toLowerCase())
             if (response.data && response.data.historical) {
                 const rawData = response.data.historical
 

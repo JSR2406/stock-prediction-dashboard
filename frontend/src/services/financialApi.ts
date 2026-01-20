@@ -112,46 +112,46 @@ export interface FinancialRatios {
 export const financialApi = {
     // Fundamentals
     getIncomeStatements: (ticker: string, period = 'annual', limit = 4) =>
-        api.get(`/api/v1/financial/${ticker}/income-statement?period=${period}&limit=${limit}`),
+        api.get(`/financial/${ticker}/income-statement?period=${period}&limit=${limit}`),
 
     getBalanceSheets: (ticker: string, period = 'annual', limit = 4) =>
-        api.get(`/api/v1/financial/${ticker}/balance-sheet?period=${period}&limit=${limit}`),
+        api.get(`/financial/${ticker}/balance-sheet?period=${period}&limit=${limit}`),
 
     getCashFlows: (ticker: string, period = 'annual', limit = 4) =>
-        api.get(`/api/v1/financial/${ticker}/cash-flow?period=${period}&limit=${limit}`),
+        api.get(`/financial/${ticker}/cash-flow?period=${period}&limit=${limit}`),
 
     getFundamentals: (ticker: string, period = 'annual', limit = 4) =>
-        api.get(`/api/v1/financial/${ticker}/fundamentals?period=${period}&limit=${limit}`),
+        api.get(`/financial/${ticker}/fundamentals?period=${period}&limit=${limit}`),
 
     // Prices
     getSnapshot: (ticker: string) =>
-        api.get(`/api/v1/financial/${ticker}/price`),
+        api.get(`/financial/${ticker}/price`),
 
     getHistory: (ticker: string, startDate: string, endDate: string, interval = 'day') =>
-        api.get(`/api/v1/financial/${ticker}/history?start_date=${startDate}&end_date=${endDate}&interval=${interval}`),
+        api.get(`/financial/${ticker}/history?start_date=${startDate}&end_date=${endDate}&interval=${interval}`),
 
     // Crypto
     getCryptoTickers: () =>
-        api.get('/api/v1/financial/crypto/tickers'),
+        api.get('/financial/crypto/tickers'),
 
     getCryptoPrice: (ticker: string) =>
-        api.get(`/api/v1/financial/crypto/${ticker}/price`),
+        api.get(`/financial/crypto/${ticker}/price`),
 
     getCryptoHistory: (ticker: string, startDate: string, endDate: string, interval = 'day') =>
-        api.get(`/api/v1/financial/crypto/${ticker}/history?start_date=${startDate}&end_date=${endDate}&interval=${interval}`),
+        api.get(`/financial/crypto/${ticker}/history?start_date=${startDate}&end_date=${endDate}&interval=${interval}`),
 
     // Other
     getNews: (ticker: string) =>
-        api.get(`/api/v1/financial/${ticker}/news`),
+        api.get(`/financial/${ticker}/news`),
 
     getFilings: (ticker: string, type?: string, limit = 10) => {
-        let url = `/api/v1/financial/${ticker}/filings?limit=${limit}`;
+        let url = `/financial/${ticker}/filings?limit=${limit}`;
         if (type) url += `&filing_type=${type}`;
         return api.get(url);
     },
 
     getRatios: (ticker: string) =>
-        api.get(`/api/v1/financial/${ticker}/ratios`)
+        api.get(`/financial/${ticker}/ratios`)
 }
 
 export default financialApi
